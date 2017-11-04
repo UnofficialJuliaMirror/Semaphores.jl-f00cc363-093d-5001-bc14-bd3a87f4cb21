@@ -1,6 +1,6 @@
 const PERMS = Base.S_IRUSR | Base.S_IWUSR | Base.S_IRGRP | Base.S_IROTH # 0644
 
-immutable NamedSemaphore
+struct NamedSemaphore
     name::String
     handle::Ptr{Void}
 
@@ -15,6 +15,7 @@ unlock(sem::NamedSemaphore) = sem_post(sem.handle)
 close(sem::NamedSemaphore) = sem_close(sem.handle)
 delete!(sem::NamedSemaphore) = sem_unlink(sem.name)
 count(sem::NamedSemaphore) = sem_getvalue(sem.handle)
+reset(sem::NamedSemaphore) = error("can not reset a NamedSemaphore")
 
 # create or open a semaphore
 # semaphore is created in unlocked state (i.e. value is 1)
@@ -46,7 +47,7 @@ end
 
 function sem_trywait(handle::Ptr{Void})
     ret = ccall(:sem_trywait, Cint, (Ptr{Void},), handle)
-    eagain = (Libc.errno() == (-Base.UV_EAGAIN))
+    eagain = (Libc.errno() == Libc.EAGAIN)
     locked = (ret == 0)
     systemerror("error locking semaphore", !locked && !eagain)
     locked
@@ -60,7 +61,7 @@ end
 
 # unlink a semaphore (semaphore will be deleted from system once all opened references to it are closed)
 function sem_unlink(name::String)
-    ret = ccall(:sem_unlink, Cint, (Ptr{UInt8},), name)
+    ret = ccall(:sem_unlink, Cint, (Cstring,), name)
     systemerror("error unlinking semaphore", ret != 0)
 end
 
