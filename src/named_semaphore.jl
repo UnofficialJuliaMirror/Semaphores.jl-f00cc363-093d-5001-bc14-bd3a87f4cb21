@@ -17,6 +17,16 @@ delete!(sem::NamedSemaphore) = sem_unlink(sem.name)
 count(sem::NamedSemaphore) = sem_getvalue(sem.handle)
 reset(sem::NamedSemaphore) = error("can not reset a NamedSemaphore")
 
+function serialize(s::AbstractSerializer, sem::NamedSemaphore)
+    Serializer.serialize_type(s, typeof(sem))
+    serialize(s, sem.name)
+end
+
+function deserialize(s::AbstractSerializer, ::Type{NamedSemaphore})
+    name = deserialize(s)
+    NamedSemaphore(name)
+end
+
 # create or open a semaphore
 # semaphore is created in unlocked state (i.e. value is 1)
 function sem_open(name::String, create::Bool=true, create_exclusive::Bool=false)
