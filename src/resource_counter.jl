@@ -13,7 +13,7 @@ struct ResourceCounter
             path,id = path
         end
         tok = ftok(path, id)
-        handle = semget(tok, nresources; create=create, create_exclusive=create_exclusive, permission=permission)
+        handle = semcreate(tok, nresources; create=create, create_exclusive=create_exclusive, permission=permission)
         new(path, id, nresources, undo, tok, handle, Vector{Cushort}(nresources))
     end
 end

@@ -35,7 +35,7 @@ end
 
 ftok(path::String, id::Int) = ccall(:ftok, Cftok, (Cstring,Cint), path, id)
 
-function semget(tok::Cftok, nsems::Int; create::Bool=true, create_exclusive::Bool=false, permission::Integer=0o660)
+function semcreate(tok::Cftok, nsems::Int; create::Bool=true, create_exclusive::Bool=false, permission::Integer=0o660)
     flags = Cint(permission)
     if create
         flags |= IPC_CREAT

@@ -39,7 +39,7 @@ function sem_open(name::String, create::Bool=true, create_exclusive::Bool=false)
     else
         handle = ccall(:sem_open, Ptr{Void}, (Cstring, Cint), name, Base.JL_O_RDWR)
     end
-    systemerror("error creating/opening semaphore", handle == 0)
+    systemerror("error creating/opening semaphore", handle == C_NULL)
     handle
 end
 

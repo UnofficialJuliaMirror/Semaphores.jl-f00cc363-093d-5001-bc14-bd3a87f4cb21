@@ -37,7 +37,7 @@ end
 function test_sysv_semaphore()
     info("testing system v semaphores")
     tok = Semaphores.ftok(pwd(), 0)
-    sem = Semaphores.semget(tok, 2)
+    sem = Semaphores.semcreate(tok, 2)
     @test sem > 0
     try
         @test 0 == Semaphores.semget(sem)
