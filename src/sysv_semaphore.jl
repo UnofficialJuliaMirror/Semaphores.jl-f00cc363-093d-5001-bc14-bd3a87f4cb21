@@ -10,13 +10,24 @@ const IPC_NOWAIT = 0o4000 # error if request must wait
 
 const SEM_UNDO = 0x1000 # undo the operation on exit
 
-const GETPID   = 11 # get sempid
-const GETVAL   = 12 # get semval
-const GETALL   = 13 # get all semval's
-const GETNCNT  = 14 # get semncnt
-const GETZCNT  = 15 # get semzcnt
-const SETVAL   = 16 # set semval
-const SETALL   = 17 # set all semval's
+@static if Sys.isapple()
+    const GETPID   = 4 # get sempid
+    const GETVAL   = 5 # get semval
+    const GETALL   = 6 # get all semval's
+    const GETNCNT  = 3 # get semncnt
+    const GETZCNT  = 7 # get semzcnt
+    const SETVAL   = 8 # set semval
+    const SETALL   = 9 # set all semval's
+else
+    const GETPID   = 11 # get sempid  # 4
+    const GETVAL   = 12 # get semval  # 5
+    const GETALL   = 13 # get all semval's  # 6
+    const GETNCNT  = 14 # get semncnt # 3
+    const GETZCNT  = 15 # get semzcnt # 7
+    const SETVAL   = 16 # set semval # 8
+    const SETALL   = 17 # set all semval's # 9
+end
+
 const SEM_STAT = 18 # linux specific
 const SEM_INFO = 19 # linux specific
 
@@ -73,6 +84,6 @@ function semget(id::Cint, vals::Vector{Cushort})
 end
 
 function semop(id::Cint, ops::Vector{SemBuf})
-    ret = ccall(:semop, Cint, (Cint,Ptr{Void},Csize_t), id, ops, length(ops))
+    ret = ccall(:semop, Cint, (Cint,Ptr{Nothing},Csize_t), id, ops, length(ops))
     systemerror("error in semaphore operation", ret < 0)
 end

@@ -1,41 +1,39 @@
 using Semaphores
-using Base.Test
-
-using Semaphores
+using Test
 
 function test_named_semaphore()
-    info("testing posix named semaphores")
+    @info("testing posix named semaphores")
     sem = NamedSemaphore("/testsem")
     close(sem)
     delete!(sem)
     sem = NamedSemaphore("/testsem", true, true)
 
-    @test count(sem) == 1
+    Sys.isapple() || (@test count(sem) == 1)
 
     lock(sem)
-    @test count(sem) == 0
+    Sys.isapple() || (@test count(sem) == 0)
     @test !trylock(sem)
     unlock(sem)
-    @test count(sem) == 1
+    Sys.isapple() || (@test count(sem) == 1)
     @test trylock(sem)
-    @test count(sem) == 0
+    Sys.isapple() || (@test count(sem) == 0)
 
-    const N = 10
+    N = 10
     for idx in 1:N
         unlock(sem)
     end
-    @test count(sem) == N
+    Sys.isapple() || (@test count(sem) == N)
     for idx in 1:N
         lock(sem)
     end
-    @test count(sem) == 0
+    Sys.isapple() || (@test count(sem) == 0)
 
     close(sem)
     delete!(sem)
 end
 
 function test_sysv_semaphore()
-    info("testing system v semaphores")
+    @info("testing system v semaphores")
     tok = Semaphores.ftok(pwd(), 0)
     sem = Semaphores.semcreate(tok, 2)
     @test sem > 0
@@ -76,7 +74,7 @@ function test_sysv_semaphore()
 end
 
 function test_resource_counter()
-    info("testing single resource counter")
+    @info("testing single resource counter")
     rescounter = ResourceCounter(pwd())
     try
         reset(rescounter, 1)
@@ -92,7 +90,7 @@ function test_resource_counter()
         delete!(rescounter)
     end
 
-    info("testing multiple resource counter")
+    @info("testing multiple resource counter")
     rescounter = ResourceCounter((pwd(),2), 2)
     try
         reset(rescounter, [1,2])

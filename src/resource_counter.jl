@@ -14,7 +14,7 @@ struct ResourceCounter
         end
         tok = ftok(path, id)
         handle = semcreate(tok, nresources; create=create, create_exclusive=create_exclusive, permission=permission)
-        new(path, id, nresources, undo, tok, handle, Vector{Cushort}(nresources))
+        new(path, id, nresources, undo, tok, handle, Vector{Cushort}(undef, nresources))
     end
 end
 
@@ -27,8 +27,8 @@ function count(sem::ResourceCounter)
 end
 count(sem::ResourceCounter, which) = semget(sem.handle, which)
 
-reset{T<:Integer}(sem::ResourceCounter, val::T, which=0) = semset(sem.handle, Cint(val), which)
-reset{T<:Integer}(sem::ResourceCounter, vals::Vector{T}) = semset(sem.handle, convert(Vector{Cushort},vals))
+reset(sem::ResourceCounter, val::T, which=0) where {T<:Integer} = semset(sem.handle, Cint(val), which)
+reset(sem::ResourceCounter, vals::Vector{T}) where {T<:Integer} = semset(sem.handle, convert(Vector{Cushort},vals))
 
-change{T<:Integer}(sem::ResourceCounter, by::T, which=0; wait::Bool=true, undo::Bool=sem.undo) = change(sem, [SemBuf(which,by;wait=wait, undo=undo)])
+change(sem::ResourceCounter, by::T, which=0; wait::Bool=true, undo::Bool=sem.undo) where {T<:Integer} = change(sem, [SemBuf(which,by;wait=wait, undo=undo)])
 change(sem::ResourceCounter, operations::Vector{SemBuf}) = semop(sem.handle, operations)
