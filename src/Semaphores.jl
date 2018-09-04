@@ -1,8 +1,10 @@
-__precompile__(true)
-
 module Semaphores
 
-import Base: lock, trylock, unlock, close, delete!, count, reset, serialize, deserialize
+using Serialization
+using Base.Filesystem
+
+import Base: lock, trylock, unlock, close, delete!, count, reset
+import Serialization: serialize, deserialize
 
 export NamedSemaphore, ResourceCounter, SemBuf
 export lock, trylock, unlock, close, delete!, count, reset, change, withlock, serialize, deserialize
